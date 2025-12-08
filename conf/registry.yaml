@@ -1,5 +1,5 @@
 pp2:
 - name: "pp2-verifier"
-  endoint_verify: "http://localhost:8000/verify"
+  endpoint_verify: "http://localhost:5000/verify"
   treshhold: 0.75
   active: true

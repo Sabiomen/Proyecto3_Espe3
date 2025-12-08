@@ -22,13 +22,7 @@ PP2_TIMEOUT = float(os.getenv("PP2_TIMEOUT", "2.0"))
 GLOBAL_TIMEOUT = float(os.getenv("GLOBAL_TIMEOUT", "5.0"))
 MAX_IMAGE_MB = int(os.getenv("MAX_IMAGE_MB", "5"))
 
-def simple_auth(authorization: str = Header(None)):
-    if authorization is None or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Unauthorized")
-    token = authorization.split(" ",1)[1]
-    if token != os.getenv("JWT_SECRET","change_me"):
-        raise HTTPException(status_code=403, detail="Forbidden")
-    return True
+
 
 @app.post("/identify-and-answer")
 async def identify_and_answer(
@@ -38,7 +32,6 @@ async def identify_and_answer(
     x_user_id: str = Header(None),
     x_user_type: str = Header("external"),
     authorization: str = Header(None),
-    _auth=Depends(simple_auth)
 ):
     # basic validations
     if image.content_type.split("/")[0] != "image":
@@ -128,7 +121,7 @@ async def healthz():
 
 # --- Metrics endpoints minimal examples (expand in db/queries.py) ---
 @app.get("/metrics/decisions")
-async def metrics_decisions(days: int = 7, _=Depends(simple_auth)):
+async def metrics_decisions(days: int = 7):
     from db.queries import decisions_agg
     db = await get_db()
     return await decisions_agg(db, days)

@@ -15,14 +15,16 @@ CONF_PATH = os.getenv("PP2_REGISTRY", "conf/registry.yaml")
 def load_roster():
     with open(CONF_PATH, "r") as f:
         conf = yaml.safe_load(f)
-    return conf.get("pp2", [])
+    return conf.get("pp2-verifier", [])
 
 async def _call_verify(client: httpx.AsyncClient, entry: Dict, img_bytes: bytes, timeout: float):
     t0 = time.perf_counter()
+    print("hola")
     try:
         files = {"image": ("img.jpg", img_bytes, "image/jpeg")}
         resp = await client.post(entry["endpoint_verify"], files=files)
         latency = (time.perf_counter() - t0) * 1000
+        print(resp)
         return entry, resp, latency, None
     except Exception as e:
         latency = (time.perf_counter() - t0) * 1000
